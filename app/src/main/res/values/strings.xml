@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">GitHubRepos</string>
+    <string name="title_nothing_show">Oops!\nNenhum item a mostrar aqui.</string>
+    <string name="title_repositories">Repositórios</string>
+    <string name="title_pull_requests">Pull Requests</string>
+    <string name="title_fail">Oops!\n</string>
+    <string name="title_fail_loading">Oops! Algo de errado ocorreu.</string>
+    <string name="connection_failed_to_network">Falha ao se conectar! Certifique-se de estar conectado com a internet e tente novamente.</string>
+    <string name="connection_failed_to_network_snackbar">Sem conexão! Estabeleça conexão e tente novamente.</string>
+    <string name="title_retry">Tente Novamente</string>
+    <string name="title_retry_snackbar">Repetir</string>
+    <string name="text_cancel">Cancelar</string>
+    <string name="img_repo_description">Avatar do github</string>
+    <string name="tap_to_reload">Toque para recarregar</string>
+    <string name="img_reload_description">Imagem de recarregamento dos repositórios</string>
+    <string name="title_author">Autor</string>
+    <string name="title_stars">Estrelas</string>
+    <string name="title_forks">Forks</string>
+    <string name="placeholder_description">placeholder</string>
+</resources>
