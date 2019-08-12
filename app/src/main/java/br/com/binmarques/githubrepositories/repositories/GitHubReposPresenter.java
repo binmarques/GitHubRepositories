@@ -47,7 +47,7 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
     public void loadFirstPage(boolean isRefresh) {
         Log.i(TAG, "loadFirstPage() ");
 
-        mGitHubServiceApi.findRepositories(getParams(),
+        mDisposable.add(mGitHubServiceApi.findRepositories(getParams(),
         new GitHubServiceApi.GitHubServiceCallback<GitHubRepo>() {
             @Override
             public void onLoaded(GitHubRepo gitHubRepo) {
@@ -92,14 +92,14 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
                     mReposView.showConnectionError();
                 }
             }
-        });
+        }));
     }
 
     @Override
     public void loadNextPage() {
         Log.i(TAG, "loadNextPage() " + mReposView.getCurrentPage());
 
-        mGitHubServiceApi.findRepositories(getParams(),
+        mDisposable.add(mGitHubServiceApi.findRepositories(getParams(),
         new GitHubServiceApi.GitHubServiceCallback<GitHubRepo>() {
             @Override
             public void onLoaded(GitHubRepo gitHubRepo) {
@@ -135,7 +135,7 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
                     mReposView.showReload(true);
                 }
             }
-        });
+        }));
     }
 
     @Override
