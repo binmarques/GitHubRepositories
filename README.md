@@ -1,7 +1,7 @@
 # GitHubRepositories
 Projeto desafio para consumir a API do GitHub e exibir os repositórios mais populares de Java.
-O projeto faz uso do padrão de arquitetura MVP e das bibliotecas Retrofit, RxJava para programação reativa, features do Java 8 como expressões lambda,
-paginação e scroll infinito, cash de dados local utilizando Room para funcionamento offline do app e mais...
+O projeto faz uso do padrão de arquitetura MVP, das bibliotecas Retrofit, RxJava para programação reativa, features do Java 8 como expressões lambda,
+paginação e scroll infinito, cache de dados local utilizando Room para funcionamento offline do app e mais...
 
 # O app objetiva-se
 
