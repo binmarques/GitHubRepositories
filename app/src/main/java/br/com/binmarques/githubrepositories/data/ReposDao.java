@@ -21,6 +21,9 @@ public interface ReposDao {
     Maybe<List<Item>> getRepositories();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertRepos(List<Item> repos);
+    void insertRepositories(List<Item> repos);
+
+    @Query("DELETE FROM Repositories")
+    void deleteRepositories();
 
 }

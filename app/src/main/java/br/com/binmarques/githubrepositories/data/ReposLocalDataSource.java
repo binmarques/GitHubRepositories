@@ -15,6 +15,8 @@ public interface ReposLocalDataSource {
 
     void saveRepositories(@NonNull List<Item> items);
 
+    void deleteRepositories();
+
     Disposable findRepositories(@NonNull LocalDataSourceCallback<List<Item>> callback);
 
 }

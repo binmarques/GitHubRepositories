@@ -20,6 +20,8 @@ public abstract class BaseFragment extends Fragment {
 
     private static Toast sToast;
 
+    protected static final String USER_PREFERENCE = "USER_PREFERENCE";
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,

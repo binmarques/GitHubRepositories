@@ -1,6 +1,8 @@
 package br.com.binmarques.githubrepositories.repositories;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
@@ -45,9 +47,10 @@ public class GitHubReposFragment extends BaseFragment implements GitHubReposAdap
     private Snackbar mSnackbar;
     private boolean mIsLoading = false;
     private boolean mIsLastPage = false;
+    private SharedPreferences mPreferences;
+    private int mCurrentPage;
 
     private static final int PAGE_START = 1;
-    private int mCurrentPage = PAGE_START;
     private static final String CURRENT_PAGE_KEY = "CURRENT_PAGE_KEY";
     private static final String REPOSITORIES_KEY = "REPOSITORIES_KEY";
     private static final String SHOULD_REMOVE_LOADING_FOOTER_KEY = "SHOULD_REMOVE_LOADING_FOOTER_KEY";
@@ -62,12 +65,24 @@ public class GitHubReposFragment extends BaseFragment implements GitHubReposAdap
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (getActivity() == null) {
+            return;
+        }
+
+        mPreferences = getActivity()
+                .getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+
+        mCurrentPage = mPreferences.getInt(CURRENT_PAGE_KEY, PAGE_START);
         mSwipeRefresh.setOnRefreshListener(this);
+
+        mSwipeRefresh.setProgressBackgroundColorSchemeColor(getResources()
+                .getColor(R.color.colorPrimary));
 
         mSwipeRefresh.setColorSchemeResources(
                 R.color.colorAccent,
-                R.color.colorPrimary,
-                R.color.colorPrimaryDark
+                R.color.colorPrimaryLight,
+                R.color.background
         );
 
         mRecyclerView.setHasFixedSize(true);
@@ -108,7 +123,7 @@ public class GitHubReposFragment extends BaseFragment implements GitHubReposAdap
         });
 
         if (savedInstanceState == null) {
-            loadData();
+            mPresenter.loadLocalDataSource();
         }
     }
 
@@ -159,16 +174,24 @@ public class GitHubReposFragment extends BaseFragment implements GitHubReposAdap
 
     @Override
     public void onRefresh() {
+        if (getActivity() == null) {
+            return;
+        }
+
         int duration = getResources()
                 .getInteger(android.R.integer.config_longAnimTime);
 
         if (mSwipeRefresh.isRefreshing()) {
-            mSwipeRefresh.postDelayed(() -> {
-                mIsLastPage = false;
-                mCurrentPage = PAGE_START;
-                mAdapter.clearItems();
-                loadData();
-            }, duration);
+            if (ActivityUtils.isNetworkAvailable(getActivity())) {
+                mSwipeRefresh.postDelayed(() -> {
+                    mIsLastPage = false;
+                    mCurrentPage = PAGE_START;
+                    mPresenter.deleteLocalDataSource();
+                    mPresenter.loadFirstPage(true);
+                }, duration);
+            } else {
+                hideRefreshing();
+            }
         }
     }
 
@@ -253,7 +276,7 @@ public class GitHubReposFragment extends BaseFragment implements GitHubReposAdap
 
             if (mAdapter.getItemCount() <= 0) {
                 showProgress(true);
-                loadData();
+                mPresenter.start();
             }
         });
     }
@@ -297,20 +320,30 @@ public class GitHubReposFragment extends BaseFragment implements GitHubReposAdap
         mAdapter.addItems(items);
     }
 
+    @Override
+    public boolean hasNetwork() {
+        if (getActivity() == null) {
+            return false;
+        }
+
+        return ActivityUtils.isNetworkAvailable(getActivity());
+    }
+
+    @Override
+    public void updatePreference() {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(CURRENT_PAGE_KEY, getCurrentPage());
+        editor.apply();
+    }
+
+    @Override
+    public void clearItems() {
+        mAdapter.clearItems();
+    }
+
     public void setErrorMessage(String errorMessage) {
         String message = getString(R.string.title_fail) + errorMessage;
         mEmptyView.setText(message);
     }
 
-    private void loadData() {
-        if (getActivity() == null) {
-            return;
-        }
-
-        if (ActivityUtils.isNetworkAvailable(getActivity())) {
-            mPresenter.start();
-        } else {
-            mPresenter.loadLocalDataSource();
-        }
-    }
 }

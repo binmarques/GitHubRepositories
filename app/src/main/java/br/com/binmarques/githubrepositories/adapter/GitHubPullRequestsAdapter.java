@@ -54,7 +54,7 @@ public class GitHubPullRequestsAdapter extends RecyclerView.Adapter<GitHubPullRe
         GitHubPullRequest item = getItem(position);
         holder.mUserName.setText(item.getUser().getLogin());
         holder.mTitle.setText(item.getTitle());
-        holder.mBody.setText(item.getBody().trim());
+        holder.mBody.setText(item.getBody() != null ? item.getBody().trim() : "");
         loadImage(mContext, item.getUser().getAvatarUrl()).into(holder.mUserImage);
 
         try {

@@ -30,8 +30,7 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
 
     private static final int PER_PAGE = 10;
 
-    public GitHubReposPresenter(GitHubServiceApi api,
-                                GitHubReposContract.View reposView,
+    public GitHubReposPresenter(GitHubServiceApi api, GitHubReposContract.View reposView,
                                 ReposLocalDataSource localDataSource) {
         this.mGitHubServiceApi = api;
         this.mReposView = reposView;
@@ -41,13 +40,14 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
 
     @Override
     public void start() {
-        loadFirstPage();
+        loadFirstPage(false);
     }
 
-    private void loadFirstPage() {
+    @Override
+    public void loadFirstPage(boolean isRefresh) {
         Log.i(TAG, "loadFirstPage() ");
 
-        mDisposable.add(mGitHubServiceApi.findRepositories(getParams(),
+        mGitHubServiceApi.findRepositories(getParams(),
         new GitHubServiceApi.GitHubServiceCallback<GitHubRepo>() {
             @Override
             public void onLoaded(GitHubRepo gitHubRepo) {
@@ -57,9 +57,14 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
                 mReposView.hideConnectionError();
 
                 if (gitHubRepo != null && gitHubRepo.getItems().length > 0) {
+                    if (isRefresh) {
+                        mReposView.clearItems();
+                        mReposView.updatePreference();
+                    }
+
                     List<Item> items = Arrays.asList(gitHubRepo.getItems());
                     mReposView.addItems(items);
-                    verifyCurrentPage();
+                    addLoadingFooter();
                     mLocalDataSource.saveRepositories(items);
                 } else {
                     mReposView.showEmptyView(true);
@@ -77,6 +82,8 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
 
                     if (error != null) {
                         mReposView.setErrorMessage(error.getMessage());
+                        mReposView.clearItems();
+                        mReposView.updatePreference();
                     }
 
                 } else {
@@ -85,25 +92,26 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
                     mReposView.showConnectionError();
                 }
             }
-        }));
+        });
     }
 
     @Override
     public void loadNextPage() {
         Log.i(TAG, "loadNextPage() " + mReposView.getCurrentPage());
 
-        mDisposable.add(mGitHubServiceApi.findRepositories(getParams(),
+        mGitHubServiceApi.findRepositories(getParams(),
         new GitHubServiceApi.GitHubServiceCallback<GitHubRepo>() {
             @Override
             public void onLoaded(GitHubRepo gitHubRepo) {
                 mReposView.showReload(false);
                 mReposView.removeLoadingFooter();
                 mReposView.setLoading(false);
+                mReposView.updatePreference();
 
                 if (gitHubRepo != null && gitHubRepo.getItems().length > 0) {
                     List<Item> items = Arrays.asList(gitHubRepo.getItems());
                     mReposView.addItems(items);
-                    verifyCurrentPage();
+                    addLoadingFooter();
                     mLocalDataSource.saveRepositories(items);
                 }
             }
@@ -127,19 +135,21 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
                     mReposView.showReload(true);
                 }
             }
-        }));
+        });
     }
 
     @Override
     public void loadLocalDataSource() {
         mDisposable.add(mLocalDataSource.findRepositories(items -> {
-            mReposView.showProgress(false);
-            mReposView.hideRefreshing();
-
             if (!items.isEmpty()) {
+                mReposView.showProgress(false);
+                mReposView.hideRefreshing();
                 mReposView.addItems(items);
-                verifyCurrentPage();
+                addLoadingFooter();
+            } else if (mReposView.hasNetwork()) {
+                start();
             } else {
+                mReposView.showProgress(false);
                 mReposView.showEmptyView(true);
                 mReposView.showConnectionError();
             }
@@ -147,11 +157,16 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
     }
 
     @Override
+    public void deleteLocalDataSource() {
+        mLocalDataSource.deleteRepositories();
+    }
+
+    @Override
     public void clearSubscriptions() {
         mDisposable.clear();
     }
 
-    private void verifyCurrentPage() {
+    private void addLoadingFooter() {
         if (mReposView.getCurrentPage() <= TOTAL_PAGES) {
             mReposView.addLoadingFooter();
         } else {
@@ -162,7 +177,7 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
     private Map<String, String> getParams() {
         Map<String, String> map = new HashMap<>();
         map.put("q", "language:Java");
-        map.put("sort", "stars");
+        map.put("sort", "stargazers_count");
         map.put("page", String.valueOf(mReposView.getCurrentPage()));
         map.put("per_page", String.valueOf(PER_PAGE));
         return map;

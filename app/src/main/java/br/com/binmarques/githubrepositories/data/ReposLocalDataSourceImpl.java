@@ -31,6 +31,14 @@ public class ReposLocalDataSourceImpl implements ReposLocalDataSource {
     }
 
     @Override
+    public void deleteRepositories() {
+        delete()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+    }
+
+    @Override
     public Disposable findRepositories(@NonNull final LocalDataSourceCallback<List<Item>> callback) {
         return mReposDao
                 .getRepositories()
@@ -39,8 +47,12 @@ public class ReposLocalDataSourceImpl implements ReposLocalDataSource {
                 .subscribe(callback::onLoaded);
     }
 
-    private Completable insert(final List<Item> items) {
-        return Completable.fromAction(() -> mReposDao.insertRepos(items));
+    private Completable insert(List<Item> items) {
+        return Completable.fromAction(() -> mReposDao.insertRepositories(items));
+    }
+
+    private Completable delete() {
+        return Completable.fromAction(() -> mReposDao.deleteRepositories());
     }
 
 }

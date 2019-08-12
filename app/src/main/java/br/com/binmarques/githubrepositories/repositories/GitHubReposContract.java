@@ -46,15 +46,25 @@ public interface GitHubReposContract {
 
         void addItems(List<Item> items);
 
+        boolean hasNetwork();
+
+        void updatePreference();
+
+        void clearItems();
+
     }
 
     interface Presenter extends BasePresenter {
 
         int TOTAL_PAGES = 50;
 
+        void loadFirstPage(boolean isRefresh);
+
         void loadNextPage();
 
         void loadLocalDataSource();
+
+        void deleteLocalDataSource();
 
         void clearSubscriptions();
     }

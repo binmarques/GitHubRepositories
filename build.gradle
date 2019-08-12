@@ -37,7 +37,7 @@ ext {
     appcompatVersion = '1.0.2'
     materialVersion = '1.1.0-alpha08'
     cardviewVersion = '1.0.0'
-    recyclerviewVersion = '1.1.0-beta01'
+    recyclerviewVersion = '1.1.0-beta02'
     constraintLayoutVersion = '2.0.0-beta2'
     glideVersion = '4.9.0'
     circleimageviewVersion = '3.0.0'
