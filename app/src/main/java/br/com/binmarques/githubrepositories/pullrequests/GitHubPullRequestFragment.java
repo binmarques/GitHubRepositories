@@ -57,10 +57,13 @@ public class GitHubPullRequestFragment extends BaseFragment implements GitHubPul
         super.onViewCreated(view, savedInstanceState);
         mSwipeRefresh.setOnRefreshListener(this);
 
+        mSwipeRefresh.setProgressBackgroundColorSchemeColor(getResources()
+                .getColor(R.color.colorPrimary));
+
         mSwipeRefresh.setColorSchemeResources(
                 R.color.colorAccent,
-                R.color.colorPrimary,
-                R.color.colorPrimaryDark
+                R.color.colorPrimaryLight,
+                R.color.background
         );
 
         mRecyclerView.setHasFixedSize(true);
@@ -74,7 +77,7 @@ public class GitHubPullRequestFragment extends BaseFragment implements GitHubPul
         mRecyclerView.setAdapter(mAdapter);
 
         if (savedInstanceState == null) {
-            loadData();
+            mPresenter.loadLocalDataSource();
         }
     }
 
@@ -107,14 +110,22 @@ public class GitHubPullRequestFragment extends BaseFragment implements GitHubPul
 
     @Override
     public void onRefresh() {
+        if (getActivity() == null) {
+            return;
+        }
+
         int duration = getResources()
                 .getInteger(android.R.integer.config_longAnimTime);
 
         if (mSwipeRefresh.isRefreshing()) {
-            mSwipeRefresh.postDelayed(() -> {
-                mAdapter.clearItems();
-                loadData();
-            }, duration);
+            if (ActivityUtils.isNetworkAvailable(getActivity())) {
+                mSwipeRefresh.postDelayed(() -> {
+                    mAdapter.clearItems();
+                    mPresenter.start();
+                }, duration);
+            } else {
+                hideRefreshing();
+            }
         }
     }
 
@@ -189,7 +200,7 @@ public class GitHubPullRequestFragment extends BaseFragment implements GitHubPul
 
             if (mAdapter.getItemCount() <= 0) {
                 showProgress(true);
-                loadData();
+                mPresenter.start();
             }
         });
     }
@@ -201,15 +212,13 @@ public class GitHubPullRequestFragment extends BaseFragment implements GitHubPul
         }
     }
 
-    private void loadData() {
+    @Override
+    public boolean hasNetwork() {
         if (getActivity() == null) {
-            return;
+            return false;
         }
 
-        if (ActivityUtils.isNetworkAvailable(getActivity())) {
-            mPresenter.start();
-        } else {
-            mPresenter.loadLocalDataSource();
-        }
+        return ActivityUtils.isNetworkAvailable(getActivity());
     }
+
 }

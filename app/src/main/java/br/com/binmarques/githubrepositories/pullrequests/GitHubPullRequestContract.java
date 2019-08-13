@@ -31,6 +31,8 @@ public interface GitHubPullRequestContract {
 
         void hideConnectionError();
 
+        boolean hasNetwork();
+
     }
 
     interface Presenter extends BasePresenter {

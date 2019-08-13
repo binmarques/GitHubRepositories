@@ -51,15 +51,17 @@ public class GitHubPullRequestPresenter implements GitHubPullRequestContract.Pre
         String repoName = mRepository.getName();
         String ownerLogin = mRepository.getOwner().getLogin();
 
-        mDisposable.add(mLocalDataSource.findPullRequests(ownerLogin, repoName, gitHubPullRequests -> {
-            mPullRequestView.showEmptyView(false);
-            mPullRequestView.showProgress(false);
-            mPullRequestView.hideRefreshing();
-            mPullRequestView.hideConnectionError();
-
-            if (gitHubPullRequests != null && !gitHubPullRequests.isEmpty()) {
-                mPullRequestView.addItems(gitHubPullRequests);
+        mDisposable.add(mLocalDataSource.findPullRequests(ownerLogin, repoName, pullRequests -> {
+            if (!pullRequests.isEmpty()) {
+                mPullRequestView.showEmptyView(false);
+                mPullRequestView.showProgress(false);
+                mPullRequestView.hideRefreshing();
+                mPullRequestView.hideConnectionError();
+                mPullRequestView.addItems(pullRequests);
+            } else if (mPullRequestView.hasNetwork()) {
+                start();
             } else {
+                mPullRequestView.showProgress(false);
                 mPullRequestView.showEmptyView(true);
                 mPullRequestView.showConnectionError();
             }
@@ -78,18 +80,17 @@ public class GitHubPullRequestPresenter implements GitHubPullRequestContract.Pre
         mDisposable.add(mGitHubServiceApi.findPullRequests(ownerLogin, repoName,
         new GitHubServiceApi.GitHubServiceCallback<List<GitHubPullRequest>>() {
             @Override
-            public void onLoaded(List<GitHubPullRequest> gitHubPullRequests) {
+            public void onLoaded(List<GitHubPullRequest> pullRequests) {
                 mPullRequestView.showEmptyView(false);
                 mPullRequestView.showProgress(false);
                 mPullRequestView.hideRefreshing();
 
-                if (gitHubPullRequests != null && !gitHubPullRequests.isEmpty()) {
-                    for (GitHubPullRequest pullRequest : gitHubPullRequests) {
+                if (pullRequests != null && !pullRequests.isEmpty()) {
+                    for (GitHubPullRequest pullRequest : pullRequests) {
                         pullRequest.setItem(mRepository);
                     }
 
-                    mPullRequestView.addItems(gitHubPullRequests);
-                    mLocalDataSource.savePullRequests(gitHubPullRequests);
+                    mLocalDataSource.savePullRequests(pullRequests);
                 } else {
                     mPullRequestView.showEmptyView(true);
                 }
