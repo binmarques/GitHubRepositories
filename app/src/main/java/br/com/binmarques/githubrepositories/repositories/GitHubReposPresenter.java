@@ -177,7 +177,7 @@ public class GitHubReposPresenter implements GitHubReposContract.Presenter {
     private Map<String, String> getParams() {
         Map<String, String> map = new HashMap<>();
         map.put("q", "language:Java");
-        map.put("sort", "stargazers_count");
+        map.put("sort", "stars");
         map.put("page", String.valueOf(mReposView.getCurrentPage()));
         map.put("per_page", String.valueOf(PER_PAGE));
         return map;

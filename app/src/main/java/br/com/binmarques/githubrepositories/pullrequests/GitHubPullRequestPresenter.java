@@ -56,7 +56,6 @@ public class GitHubPullRequestPresenter implements GitHubPullRequestContract.Pre
                 mPullRequestView.showEmptyView(false);
                 mPullRequestView.showProgress(false);
                 mPullRequestView.hideRefreshing();
-                mPullRequestView.hideConnectionError();
                 mPullRequestView.addItems(pullRequests);
             } else if (mPullRequestView.hasNetwork()) {
                 start();
@@ -84,6 +83,7 @@ public class GitHubPullRequestPresenter implements GitHubPullRequestContract.Pre
                 mPullRequestView.showEmptyView(false);
                 mPullRequestView.showProgress(false);
                 mPullRequestView.hideRefreshing();
+                mPullRequestView.hideConnectionError();
 
                 if (pullRequests != null && !pullRequests.isEmpty()) {
                     for (GitHubPullRequest pullRequest : pullRequests) {

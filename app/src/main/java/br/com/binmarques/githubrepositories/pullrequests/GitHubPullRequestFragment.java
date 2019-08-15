@@ -119,10 +119,7 @@ public class GitHubPullRequestFragment extends BaseFragment implements GitHubPul
 
         if (mSwipeRefresh.isRefreshing()) {
             if (ActivityUtils.isNetworkAvailable(getActivity())) {
-                mSwipeRefresh.postDelayed(() -> {
-                    mAdapter.clearItems();
-                    mPresenter.start();
-                }, duration);
+                mSwipeRefresh.postDelayed(() -> mPresenter.start(), duration);
             } else {
                 hideRefreshing();
             }

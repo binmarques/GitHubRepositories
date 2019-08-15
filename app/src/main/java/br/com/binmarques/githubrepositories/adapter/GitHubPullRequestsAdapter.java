@@ -98,11 +98,6 @@ public class GitHubPullRequestsAdapter extends RecyclerView.Adapter<GitHubPullRe
         return mItems;
     }
 
-    public void clearItems() {
-        mItems.clear();
-        notifyDataSetChanged();
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tvAuthorName) TextView mUserName;
