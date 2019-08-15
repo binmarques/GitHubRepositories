@@ -40,7 +40,6 @@ ext {
     recyclerviewVersion = '1.1.0-beta02'
     constraintLayoutVersion = '2.0.0-beta2'
     glideVersion = '4.9.0'
-    circleimageviewVersion = '3.0.0'
     butterknifeVersion = '10.1.0'
     retrofitVersion = '2.6.0'
     rxjavaVersion = '2.2.0'
